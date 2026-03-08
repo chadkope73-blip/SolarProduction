@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Solar Production Calculator | In Tandem Toolworks</title>
+  <meta
+    name="description"
+    content="Free solar production calculator. Estimate daily, monthly, and annual solar energy output based on system size, sun hours, tilt, azimuth, and latitude."
+  />
+  <meta name="robots" content="index, follow" />
+
+  <meta property="og:title" content="Solar Production Calculator" />
+  <meta
+    property="og:description"
+    content="Estimate daily, monthly, and annual solar output using system size, sun hours, tilt, azimuth, and latitude."
+  />
+  <meta property="og:image" content="https://ittworks.com/logo.png" />
+  <meta property="og:url" content="https://production.ittworks.com" />
+  <meta property="og:type" content="website" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Solar Production Calculator" />
+  <meta
+    name="twitter:description"
+    content="Estimate daily, monthly, and annual solar output using system size, sun hours, tilt, azimuth, and latitude."
+  />
+  <meta name="twitter:image" content="https://ittworks.com/logo.png" />
+
+  <link rel="icon" href="/logo.png" />
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f1416;
+      --panel: #1b2224;
+      --panel-2: #101719;
+      --text: #e8e0c9;
+      --muted: #cfc6ad;
+      --muted-2: #9f9884;
+      --gold: #c8a46b;
+      --gold-hover: #d9b983;
+      --border: #4f5a5e;
+      --teal: #2e5e5b;
+      --teal-hover: #3d7a76;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .container {
+      background: var(--panel);
+      max-width: 580px;
+      margin: 24px auto;
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-logo {
+      display: block;
+      margin: 0 auto 20px auto;
+      max-width: 180px;
+      width: 100%;
+      height: auto;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 28px;
+      color: var(--gold);
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      max-width: 360px;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 12px;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    input,
+    select {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    input::placeholder {
+      color: var(--muted-2);
+    }
+
+    button {
+      border: none;
+      background: var(--gold);
+      color: var(--bg);
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: var(--gold-hover);
+    }
+
+    .secondary {
+      background: var(--teal);
+      color: var(--text);
+    }
+
+    .secondary:hover {
+      background: var(--teal-hover);
+    }
+
+    .helper {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #afa890;
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      line-height: 1.45;
+    }
+
+    .result {
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      text-align: left;
+      display: none;
+      line-height: 1.65;
+    }
+
+    .result strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 19px;
+      color: var(--gold);
+    }
+
+    .note {
+      margin-top: 18px;
+      font-size: 14px;
+      color: var(--muted-2);
+    }
+
+    .disclaimer {
+      margin-top: 18px;
+      padding: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      text-align: left;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.55;
+    }
+
+    .footer {
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--muted-2);
+    }
+
+    .footer a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="In Tandem Toolworks Logo" class="brand-logo" />
+
+    <h1>Solar Production Calculator</h1>
+
+    <p>
+      Estimate daily, monthly, and annual solar energy output using system size,
+      sun hours, latitude, tilt, and panel direction.
+    </p>
+
+    <input
+      id="systemSize"
+      type="number"
+      step="0.1"
+      placeholder="System Size in kW (Example: 5)"
+    />
+
+    <input
+      id="sunHours"
+      type="number"
+      step="0.1"
+      placeholder="Average Sun Hours per Day (Example: 5)"
+    />
+
+    <input
+      id="latitude"
+      type="number"
+      step="0.1"
+      placeholder="Latitude (Example: 39.7)"
+    />
+
+    <input
+      id="tilt"
+      type="number"
+      step="1"
+      placeholder="Panel Tilt in Degrees (Example: 33)"
+    />
+
+    <input
+      id="azimuth"
+      type="number"
+      step="1"
+      placeholder="Panel Azimuth in Degrees (Example: 180)"
+    />
+
+    <div class="helper">
+      In the northern hemisphere, fixed panels usually face true south (180°). In the southern hemisphere, they usually face true north (0°). Use your Panel Pointer tool to estimate tilt and azimuth.
+    </div>
+
+    <button onclick="calculateProduction()">Calculate Production</button>
+
+    <div id="result" class="result"></div>
+
+    <div class="note">
+      This is a practical planning estimate for solar production.
+    </div>
+
+    <div class="disclaimer">
+      Estimates are for general planning only. Real production depends on weather,
+      shading, equipment efficiency, wiring losses, inverter performance, seasonal
+      sun angle changes, dust, snow, temperature, and local conditions.
+    </div>
+
+    <div class="footer">
+      Built by In Tandem Toolworks · <a href="https://ittworks.com" target="_blank">Panel Pointer</a>
+    </div>
+  </div>
+
+  <script>
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function getIdealAzimuth(lat) {
+      return lat >= 0 ? 180 : 0;
+    }
+
+    function getIdealTilt(lat) {
+      return Math.round(Math.abs(lat) * 0.76 + 3.1);
+    }
+
+    function calculateDirectionFactor(actualAzimuth, idealAzimuth) {
+      let difference = Math.abs(actualAzimuth - idealAzimuth);
+      if (difference > 180) difference = 360 - difference;
+
+      const factor = 1 - (difference / 180) * 0.35;
+      return clamp(factor, 0.65, 1.0);
+    }
+
+    function calculateTiltFactor(actualTilt, idealTilt) {
+      const difference = Math.abs(actualTilt - idealTilt);
+      const factor = 1 - (difference / 90) * 0.20;
+      return clamp(factor, 0.80, 1.0);
+    }
+
+    function calculateProduction() {
+      const systemSize = parseFloat(document.getElementById("systemSize").value);
+      const sunHours = parseFloat(document.getElementById("sunHours").value);
+      const latitude = parseFloat(document.getElementById("latitude").value);
+      const tilt = parseFloat(document.getElementById("tilt").value);
+      const azimuth = parseFloat(document.getElementById("azimuth").value);
+
+      const resultBox = document.getElementById("result");
+
+      if (
+        isNaN(systemSize) ||
+        isNaN(sunHours) ||
+        isNaN(latitude) ||
+        isNaN(tilt) ||
+        isNaN(azimuth)
+      ) {
+        resultBox.style.display = "block";
+        resultBox.innerHTML = "<strong>Please complete all fields with valid values.</strong>";
+        return;
+      }
+
+      const idealAzimuth = getIdealAzimuth(latitude);
+      const idealTilt = getIdealTilt(latitude);
+
+      const directionFactor = calculateDirectionFactor(azimuth, idealAzimuth);
+      const tiltFactor = calculateTiltFactor(tilt, idealTilt);
+
+      const baseDailyKwh = systemSize * sunHours;
+      const adjustedDailyKwh = baseDailyKwh * directionFactor * tiltFactor * 0.82;
+      const monthlyKwh = adjustedDailyKwh * 30.4;
+      const annualKwh = adjustedDailyKwh * 365;
+
+      const efficiencyPercent = Math.round(directionFactor * tiltFactor * 82);
+
+      resultBox.style.display = "block";
+      resultBox.innerHTML =
+        "<strong>Estimated Daily Production: " + adjustedDailyKwh.toFixed(1) + " kWh</strong>" +
+        "<div><b>Estimated Monthly Production:</b> " + monthlyKwh.toFixed(0) + " kWh</div>" +
+        "<div><b>Estimated Annual Production:</b> " + annualKwh.toFixed(0) + " kWh</div>" +
+        "<br>" +
+        "<div><b>System Size:</b> " + systemSize + " kW</div>" +
+        "<div><b>Average Sun Hours:</b> " + sunHours + "</div>" +
+        "<div><b>Latitude:</b> " + latitude + "°</div>" +
+        "<div><b>Panel Tilt:</b> " + tilt + "°</div>" +
+        "<div><b>Panel Azimuth:</b> " + azimuth + "°</div>" +
+        "<br>" +
+        "<div><b>Suggested Ideal Tilt:</b> " + idealTilt + "°</div>" +
+        "<div><b>Suggested Ideal Azimuth:</b> " + idealAzimuth + "°</div>" +
+        "<div><b>Estimated System Effectiveness:</b> " + efficiencyPercent + "%</div>" +
+        "<br>" +
+        "<div><b>Tip:</b> Use this estimate as a planning baseline. Shading, seasonal changes, and equipment quality can significantly affect real output.</div>";
+    }
+  </script>
+</body>
+</html>
