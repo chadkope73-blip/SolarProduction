@@ -7,7 +7,7 @@
 
 <title>Solar Production Calculator</title>
 
-<meta name="description" content="Estimate daily, monthly, and annual solar energy production based on system size and sun hours.">
+<meta name="description" content="Estimate daily, monthly, and annual solar energy output using system size, sun hours, latitude, tilt, and panel direction.">
 
 <script defer src="/_vercel/insights/script.js"></script>
 
@@ -38,6 +38,13 @@ margin-bottom:20px;
 
 h1{
 color:#c8a46b;
+margin-bottom:10px;
+}
+
+p{
+color:#cfc6ad;
+line-height:1.5;
+margin-bottom:20px;
 }
 
 input,button{
@@ -47,6 +54,7 @@ margin-top:10px;
 border-radius:8px;
 border:none;
 font-size:16px;
+box-sizing:border-box;
 }
 
 input{
@@ -66,6 +74,14 @@ button:hover{
 background:#d9b983;
 }
 
+.helper{
+margin-top:8px;
+font-size:14px;
+color:#afa890;
+text-align:left;
+line-height:1.4;
+}
+
 .result{
 margin-top:20px;
 padding:15px;
@@ -74,6 +90,14 @@ border-radius:8px;
 border:1px solid #4f5a5e;
 display:none;
 text-align:left;
+line-height:1.6;
+}
+
+.result strong{
+display:block;
+margin-bottom:8px;
+font-size:18px;
+color:#c8a46b;
 }
 
 .tools{
@@ -115,6 +139,7 @@ font-weight:bold;
 
 .donate-btn img{
 width:24px;
+height:24px;
 }
 
 .footer{
@@ -139,18 +164,26 @@ text-decoration:underline;
 
 <div class="container">
 
-<img src="logo.png" class="logo">
+<img src="logo.png" class="logo" alt="In Tandem Toolworks logo">
 
 <h1>Solar Production Calculator</h1>
 
 <p>
-Estimate daily, monthly, and annual solar energy output.
+Estimate daily, monthly, and annual solar energy output using system size,
+sun hours, latitude, tilt, and panel direction.
 </p>
 
-<input id="size" placeholder="System Size in kW (Example: 5)">
-<input id="sun" placeholder="Average Sun Hours per Day (Example: 5)">
+<input id="systemSize" placeholder="System Size in kW (Example: 5)">
+<input id="sunHours" placeholder="Average Sun Hours per Day (Example: 5)">
+<input id="latitude" placeholder="Latitude (Example: 39.7)">
+<input id="tilt" placeholder="Panel Tilt in Degrees (Example: 33)">
+<input id="azimuth" placeholder="Panel Azimuth in Degrees (Example: 180)">
 
-<button onclick="calcProduction()">Calculate Production</button>
+<div class="helper">
+In the northern hemisphere, fixed panels usually face true south (180°). In the southern hemisphere, they usually face true north (0°).
+</div>
+
+<button onclick="calculateProduction()">Calculate Production</button>
 
 <div id="result" class="result"></div>
 
@@ -174,7 +207,7 @@ Off-Grid Solar System Size Calculator
 
 <a class="donate-btn" href="https://donate.stripe.com/4gM3cv0kV4UJbzPfeDeAg00" target="_blank">
 
-<img src="ittw-donate.png">
+<img src="ittw-donate.png" alt="Donation icon">
 
 Support InTandem Toolworks
 
@@ -206,24 +239,78 @@ Follow us on Facebook
 
 <script>
 
-function calcProduction(){
+function clamp(value,min,max){
+return Math.max(min,Math.min(max,value));
+}
 
-let size=parseFloat(document.getElementById("size").value);
-let sun=parseFloat(document.getElementById("sun").value);
+function getIdealAzimuth(lat){
+return lat>=0 ? 180 : 0;
+}
 
-if(isNaN(size)||isNaN(sun)) return;
+function getIdealTilt(lat){
+return Math.round(Math.abs(lat)*0.76+3.1);
+}
 
-let daily=size*sun;
-let monthly=daily*30;
-let annual=daily*365;
+function calculateDirectionFactor(actualAzimuth,idealAzimuth){
+let difference=Math.abs(actualAzimuth-idealAzimuth);
+if(difference>180) difference=360-difference;
+
+let factor=1-(difference/180)*0.35;
+return clamp(factor,0.65,1.0);
+}
+
+function calculateTiltFactor(actualTilt,idealTilt){
+let difference=Math.abs(actualTilt-idealTilt);
+let factor=1-(difference/90)*0.20;
+return clamp(factor,0.80,1.0);
+}
+
+function calculateProduction(){
+
+let systemSize=parseFloat(document.getElementById("systemSize").value);
+let sunHours=parseFloat(document.getElementById("sunHours").value);
+let latitude=parseFloat(document.getElementById("latitude").value);
+let tilt=parseFloat(document.getElementById("tilt").value);
+let azimuth=parseFloat(document.getElementById("azimuth").value);
 
 let result=document.getElementById("result");
-result.style.display="block";
 
+if(isNaN(systemSize)||isNaN(sunHours)||isNaN(latitude)||isNaN(tilt)||isNaN(azimuth)){
+result.style.display="block";
+result.innerHTML="<strong>Please complete all fields with valid values.</strong>";
+return;
+}
+
+let idealAzimuth=getIdealAzimuth(latitude);
+let idealTilt=getIdealTilt(latitude);
+
+let directionFactor=calculateDirectionFactor(azimuth,idealAzimuth);
+let tiltFactor=calculateTiltFactor(tilt,idealTilt);
+
+let baseDailyKwh=systemSize*sunHours;
+let adjustedDailyKwh=baseDailyKwh*directionFactor*tiltFactor*0.82;
+let monthlyKwh=adjustedDailyKwh*30.4;
+let annualKwh=adjustedDailyKwh*365;
+
+let efficiencyPercent=Math.round(directionFactor*tiltFactor*82);
+
+result.style.display="block";
 result.innerHTML=
-"<b>Estimated Daily Production:</b> "+daily.toFixed(2)+" kWh<br><br>"+
-"<b>Estimated Monthly Production:</b> "+monthly.toFixed(2)+" kWh<br><br>"+
-"<b>Estimated Annual Production:</b> "+annual.toFixed(2)+" kWh";
+"<strong>Estimated Daily Production: "+adjustedDailyKwh.toFixed(1)+" kWh</strong>"+
+"<div><b>Estimated Monthly Production:</b> "+monthlyKwh.toFixed(0)+" kWh</div>"+
+"<div><b>Estimated Annual Production:</b> "+annualKwh.toFixed(0)+" kWh</div>"+
+"<br>"+
+"<div><b>System Size:</b> "+systemSize+" kW</div>"+
+"<div><b>Average Sun Hours:</b> "+sunHours+"</div>"+
+"<div><b>Latitude:</b> "+latitude+"°</div>"+
+"<div><b>Panel Tilt:</b> "+tilt+"°</div>"+
+"<div><b>Panel Azimuth:</b> "+azimuth+"°</div>"+
+"<br>"+
+"<div><b>Suggested Ideal Tilt:</b> "+idealTilt+"°</div>"+
+"<div><b>Suggested Ideal Azimuth:</b> "+idealAzimuth+"°</div>"+
+"<div><b>Estimated System Effectiveness:</b> "+efficiencyPercent+"%</div>"+
+"<br>"+
+"<div><b>Tip:</b> Use this estimate as a planning baseline. Shading, seasonal changes, and equipment quality can significantly affect real output.</div>";
 
 }
 
