@@ -5,97 +5,121 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Solar Production Calculator | In Tandem Toolworks</title>
+<title>Solar Production Calculator</title>
+
+<meta name="description" content="Estimate daily, monthly, and annual solar energy production based on system size and sun hours.">
+
+<script defer src="/_vercel/insights/script.js"></script>
 
 <style>
 
 body{
 font-family:Arial, sans-serif;
-background:#0c1116;
-color:#d7c7a3;
+background:#0f1416;
+color:#e8e0c9;
 text-align:center;
+margin:0;
 padding:20px;
 }
 
 .container{
 max-width:520px;
 margin:auto;
-background:#141c22;
-padding:30px;
-border-radius:16px;
-box-shadow:0 0 25px rgba(0,0,0,.6);
+background:#1b2224;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,.4);
 }
 
 .logo{
-max-width:160px;
+max-width:180px;
 margin-bottom:20px;
 }
 
 h1{
-font-size:28px;
-margin-bottom:10px;
+color:#c8a46b;
 }
 
-p{
-color:#a8a8a8;
-margin-bottom:25px;
-}
-
-input, select{
+input,button{
 width:100%;
-padding:14px;
-margin:8px 0;
-border-radius:10px;
-border:1px solid #3a444c;
-background:#0c1116;
-color:white;
+padding:12px;
+margin-top:10px;
+border-radius:8px;
+border:none;
 font-size:16px;
+}
+
+input{
+background:#101719;
+color:#e8e0c9;
+border:1px solid #4f5a5e;
 }
 
 button{
-width:100%;
-padding:14px;
-margin-top:10px;
 background:#c8a46b;
-border:none;
-border-radius:10px;
-font-size:16px;
+color:#000;
 font-weight:bold;
 cursor:pointer;
 }
 
 button:hover{
-background:#d8b57c;
+background:#d9b983;
 }
 
 .result{
 margin-top:20px;
-font-size:18px;
+padding:15px;
+background:#101719;
+border-radius:8px;
+border:1px solid #4f5a5e;
+display:none;
+text-align:left;
 }
 
 .tools{
 margin-top:35px;
 }
 
-.toolbtn{
+.tool-btn{
 display:block;
-background:#1b2329;
-padding:16px;
-border-radius:12px;
-margin:12px 0;
-color:#d7c7a3;
+margin:8px auto;
+padding:10px;
+background:#101719;
+border:1px solid #4f5a5e;
+border-radius:8px;
+color:#e8e0c9;
 text-decoration:none;
 font-weight:bold;
 }
 
-.toolbtn:hover{
-background:#24313a;
+.tool-btn:hover{
+background:#1e2a30;
+}
+
+.donate{
+margin-top:25px;
+}
+
+.donate-btn{
+display:inline-flex;
+align-items:center;
+gap:10px;
+padding:10px 16px;
+border:1px solid #c8a46b;
+border-radius:8px;
+background:#0e1a22;
+color:#c8a46b;
+text-decoration:none;
+font-weight:bold;
+}
+
+.donate-btn img{
+width:24px;
 }
 
 .footer{
-margin-top:40px;
+margin-top:25px;
 font-size:14px;
-color:#8f8f8f;
 }
 
 .footer a{
@@ -103,7 +127,12 @@ color:#c8a46b;
 text-decoration:none;
 }
 
+.footer a:hover{
+text-decoration:underline;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -115,48 +144,55 @@ text-decoration:none;
 <h1>Solar Production Calculator</h1>
 
 <p>
-Estimate daily, monthly, and annual solar energy output using system size,
-sun hours, latitude, tilt, and panel direction.
+Estimate daily, monthly, and annual solar energy output.
 </p>
 
-<input id="systemSize" placeholder="System Size in kW (Example: 5)">
-<input id="sunHours" placeholder="Average Sun Hours per Day (Example: 5)">
-<input id="latitude" placeholder="Latitude (Example: 39)">
-<input id="tilt" placeholder="Panel Tilt Degrees (Example: 30)">
+<input id="size" placeholder="System Size in kW (Example: 5)">
+<input id="sun" placeholder="Average Sun Hours per Day (Example: 5)">
 
-<select id="direction">
-<option value="1">South (Optimal)</option>
-<option value="0.9">SE / SW</option>
-<option value="0.75">East / West</option>
-<option value="0.55">NE / NW</option>
-<option value="0.4">North</option>
-</select>
+<button onclick="calcProduction()">Calculate Production</button>
 
-<button onclick="calculate()">Calculate Production</button>
-
-<div class="result" id="result"></div>
+<div id="result" class="result"></div>
 
 <div class="tools">
 
 <h3>More Solar Tools</h3>
 
-<a class="toolbtn" href="https://panelpointer.ittworks.com">
+<a class="tool-btn" href="https://ittworks.com">
 Solar Panel Tilt & Direction Calculator
 </a>
 
-<a class="toolbtn" href="https://offgrid.ittworks.com">
+<a class="tool-btn" href="https://offgrid.ittworks.com">
 Off-Grid Solar System Size Calculator
 </a>
 
 </div>
 
+<div class="donate">
+
+<p>Enjoying the tools? Support development.</p>
+
+<a class="donate-btn" href="https://donate.stripe.com/4gM3cv0kV4UJbzPfeDeAg00" target="_blank">
+
+<img src="ittw-donate.png">
+
+Support InTandem Toolworks
+
+</a>
+
+<p style="font-size:13px;opacity:.7;">Thank you for the donation.</p>
+
+</div>
+
 <div class="footer">
 
-Built by <strong>In Tandem Toolworks</strong>
+Built by <b>In Tandem Toolworks</b>
 
 <br><br>
 
-<a href="mailto:support@ittworks.com">support@ittworks.com</a>
+<a href="mailto:support@ittworks.com">
+support@ittworks.com
+</a>
 
 <br><br>
 
@@ -170,25 +206,24 @@ Follow us on Facebook
 
 <script>
 
-function calculate(){
+function calcProduction(){
 
-let systemSize=parseFloat(document.getElementById("systemSize").value);
-let sunHours=parseFloat(document.getElementById("sunHours").value);
-let direction=parseFloat(document.getElementById("direction").value);
+let size=parseFloat(document.getElementById("size").value);
+let sun=parseFloat(document.getElementById("sun").value);
 
-if(!systemSize||!sunHours){
-document.getElementById("result").innerHTML="Enter system size and sun hours.";
-return;
-}
+if(isNaN(size)||isNaN(sun)) return;
 
-let daily=systemSize*sunHours*direction;
+let daily=size*sun;
 let monthly=daily*30;
-let yearly=daily*365;
+let annual=daily*365;
 
-document.getElementById("result").innerHTML=
-"Daily Production: "+daily.toFixed(2)+" kWh<br>"+
-"Monthly Production: "+monthly.toFixed(2)+" kWh<br>"+
-"Annual Production: "+yearly.toFixed(2)+" kWh";
+let result=document.getElementById("result");
+result.style.display="block";
+
+result.innerHTML=
+"<b>Estimated Daily Production:</b> "+daily.toFixed(2)+" kWh<br><br>"+
+"<b>Estimated Monthly Production:</b> "+monthly.toFixed(2)+" kWh<br><br>"+
+"<b>Estimated Annual Production:</b> "+annual.toFixed(2)+" kWh";
 
 }
 
