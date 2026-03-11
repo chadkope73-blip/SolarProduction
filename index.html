@@ -8,41 +8,96 @@
 <title>Solar Production Calculator</title>
 
 <meta name="description" content="Estimate daily, monthly, and annual solar energy output using system size, sun hours, latitude, tilt, and panel direction.">
+<meta name="theme-color" content="#0f1416">
+
+<link rel="icon" href="logo.png">
 
 <script defer src="/_vercel/insights/script.js"></script>
 
 <style>
 
+:root{
+--bg1:#0b1220;
+--bg2:#13233f;
+--card:rgba(20,32,51,.82);
+--line:#2a3d63;
+--text:#e8eefc;
+--muted:#a9b7d3;
+--accent:#8dd3ff;
+--accent2:#ffd98a;
+--good:#65d98f;
+--maybe:#ffd166;
+--bad:#ff8a80;
+--panel:#0d1727;
+}
+
+*{
+box-sizing:border-box;
+}
+
 body{
-font-family:Arial, sans-serif;
-background:#0f1416;
-color:#e8e0c9;
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+background:
+linear-gradient(rgba(11,18,32,.45),rgba(11,18,32,.55)),
+url("/topo-bg.jpg");
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+color:var(--text);
 text-align:center;
 margin:0;
 padding:20px;
+min-height:100vh;
+}
+
+.navgenie-link{
+position:fixed;
+top:16px;
+right:16px;
+z-index:1000;
+}
+
+.navgenie-link a{
+background:#0f1b2e;
+color:#f2d8a7;
+padding:8px 14px;
+border-radius:10px;
+text-decoration:none;
+font-weight:600;
+border:1px solid rgba(255,255,255,.15);
+box-shadow:0 6px 16px rgba(0,0,0,.35);
+display:inline-block;
+}
+
+.navgenie-link a:hover{
+text-decoration:none;
+filter:brightness(1.05);
 }
 
 .container{
-max-width:520px;
+max-width:560px;
 margin:auto;
-background:#1b2224;
+background:var(--card);
 padding:25px;
-border-radius:12px;
-box-shadow:0 5px 15px rgba(0,0,0,.4);
+border-radius:24px;
+border:1px solid var(--line);
+backdrop-filter:blur(8px);
+box-shadow:0 16px 40px rgba(0,0,0,.25);
 }
 
 .logo{
 max-width:180px;
 margin-bottom:20px;
+filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
 }
 
 h1{
-color:#c8a46b;
+color:var(--accent2);
 margin-bottom:10px;
 }
 
 p{
-color:#cfc6ad;
+color:var(--muted);
 line-height:1.5;
 margin-bottom:20px;
 }
@@ -51,33 +106,36 @@ input,button{
 width:100%;
 padding:12px;
 margin-top:10px;
-border-radius:8px;
+border-radius:14px;
 border:none;
 font-size:16px;
 box-sizing:border-box;
+transition:transform .15s ease, filter .15s ease, box-shadow .15s ease;
 }
 
 input{
-background:#101719;
-color:#e8e0c9;
-border:1px solid #4f5a5e;
+background:var(--panel);
+color:var(--text);
+border:1px solid var(--line);
 }
 
 button{
-background:#c8a46b;
-color:#000;
+background:linear-gradient(180deg,var(--accent),#67b8f6);
+color:#07111f;
 font-weight:bold;
 cursor:pointer;
+box-shadow:0 10px 24px rgba(103,184,246,.22);
 }
 
 button:hover{
-background:#d9b983;
+filter:brightness(1.05);
+transform:scale(1.01);
 }
 
 .helper{
 margin-top:8px;
 font-size:14px;
-color:#afa890;
+color:var(--muted);
 text-align:left;
 line-height:1.4;
 }
@@ -85,39 +143,20 @@ line-height:1.4;
 .result{
 margin-top:20px;
 padding:15px;
-background:#101719;
-border-radius:8px;
-border:1px solid #4f5a5e;
+background:var(--panel);
+border-radius:14px;
+border:1px solid var(--line);
 display:none;
 text-align:left;
 line-height:1.6;
+color:var(--text);
 }
 
 .result strong{
 display:block;
 margin-bottom:8px;
 font-size:18px;
-color:#c8a46b;
-}
-
-.tools{
-margin-top:35px;
-}
-
-.tool-btn{
-display:block;
-margin:8px auto;
-padding:10px;
-background:#101719;
-border:1px solid #4f5a5e;
-border-radius:8px;
-color:#e8e0c9;
-text-decoration:none;
-font-weight:bold;
-}
-
-.tool-btn:hover{
-background:#1e2a30;
+color:var(--accent2);
 }
 
 .donate{
@@ -129,10 +168,10 @@ display:inline-flex;
 align-items:center;
 gap:10px;
 padding:10px 16px;
-border:1px solid #c8a46b;
-border-radius:8px;
+border:1px solid var(--accent2);
+border-radius:12px;
 background:#0e1a22;
-color:#c8a46b;
+color:var(--accent2);
 text-decoration:none;
 font-weight:bold;
 }
@@ -145,15 +184,37 @@ height:24px;
 .footer{
 margin-top:25px;
 font-size:14px;
+color:var(--muted);
 }
 
 .footer a{
-color:#c8a46b;
+color:var(--accent2);
 text-decoration:none;
 }
 
 .footer a:hover{
 text-decoration:underline;
+}
+
+.footer-nav{
+text-align:center;
+margin-top:30px;
+}
+
+.footer-nav a{
+display:inline-block;
+background:#0f1b2e;
+color:#f2d8a7;
+padding:10px 16px;
+border-radius:10px;
+text-decoration:none;
+font-weight:600;
+border:1px solid rgba(255,255,255,.15);
+box-shadow:0 6px 16px rgba(0,0,0,.35);
+}
+
+.footer-nav a:hover{
+filter:brightness(1.05);
 }
 
 </style>
@@ -162,6 +223,10 @@ text-decoration:underline;
 
 <body>
 
+<div class="navgenie-link">
+<a href="https://navgenie.ittworks.com">🧭 Toolbelt</a>
+</div>
+
 <div class="container">
 
 <img src="logo.png" class="logo" alt="In Tandem Toolworks logo">
@@ -169,8 +234,7 @@ text-decoration:underline;
 <h1>Solar Production Calculator</h1>
 
 <p>
-Estimate daily, monthly, and annual solar energy output using system size,
-sun hours, latitude, tilt, and panel direction.
+Estimate daily, monthly, and annual solar energy output using system size, sun hours, latitude, tilt, and panel direction.
 </p>
 
 <input id="systemSize" placeholder="System Size in kW (Example: 5)">
@@ -187,20 +251,6 @@ In the northern hemisphere, fixed panels usually face true south (180°). In the
 
 <div id="result" class="result"></div>
 
-<div class="tools">
-
-<h3>More Solar Tools</h3>
-
-<a class="tool-btn" href="https://ittworks.com">
-Solar Panel Tilt & Direction Calculator
-</a>
-
-<a class="tool-btn" href="https://offgrid.ittworks.com">
-Off-Grid Solar System Size Calculator
-</a>
-
-</div>
-
 <div class="donate">
 
 <p>Enjoying the tools? Support development.</p>
@@ -215,6 +265,10 @@ Support InTandem Toolworks
 
 <p style="font-size:13px;opacity:.7;">Thank you for the donation.</p>
 
+</div>
+
+<div class="footer-nav">
+<a href="https://navgenie.ittworks.com">Return to Toolbelt</a>
 </div>
 
 <div class="footer">
